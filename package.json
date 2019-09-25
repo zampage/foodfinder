@@ -1,0 +1,16 @@
+{
+  "name": "foodfinder",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node foodfinder.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "jsdom": "^15.1.1",
+    "moment": "^2.24.0",
+    "node-fetch": "^2.6.0"
+  }
+}
