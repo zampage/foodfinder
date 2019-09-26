@@ -2,6 +2,7 @@ import { Moment } from 'moment';
 
 export interface Place {
     title: string;
+    name: string;
     link: string;
     menu: any[];
 

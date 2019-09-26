@@ -4,6 +4,7 @@ const moment = require('moment');
 
 export class Shopbar implements Place {
     public title: string = 'Shopbar';
+    public name: string = 'shopbar';
     public link: string = 'http://www.shopbar.ch/menueplan/';
     public menu: MenuDay[];
 

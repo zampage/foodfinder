@@ -4,6 +4,7 @@ const moment = require('moment');
 
 export class Coop implements Place {
     public title: string = 'Coop';
+    public name: string = 'coop';
     public link: string = 'https://www.coop-restaurant.ch/de/menueseite.vst2076.restaurant.html';
     public menu: MenuDay[];
 
