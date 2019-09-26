@@ -2,12 +2,12 @@
   "name": "foodfinder",
   "version": "1.0.0",
   "description": "Dieses CLI zeigt Menupläne von diversen Anbietern an.",
-  "main": "dist/foodfinder.js",
+  "main": "dist/index.js",
   "bin": {
-    "foodfinder": "dist/foodfinder.js"
+    "foodfinder": "dist/index.js"
   },
   "scripts": {
-    "start": "node dist/foodfinder.js",
+    "start": "node dist/index.js",
     "serve": "tsc -p ./ --watch",
     "build": "tsc -p ./"
   },

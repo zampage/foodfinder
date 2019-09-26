@@ -8,15 +8,15 @@ import { Coop } from './places/coop';
 import { Moment } from 'moment';
 const axios = require('axios').default;
 const moment = require('moment');
-const program = require('commander');
-const { description, version } = require('../package.json')
-moment.locale('de');
 
+export class Foodfinder {
+    public places: Place[] = [new Shopbar(), new Coop()];
 
-class Foodfinder {
-    public static places: Place[] = [new Shopbar(), new Coop()];
+    constructor(
+        public program: any
+    ) {}
 
-    public static async render(place: Place) {
+    public async render(place: Place) {
         place = await this.loadPlace(place);
         this.renderTitle(place);
         this.filterToday(place.menu)
@@ -26,9 +26,9 @@ class Foodfinder {
             })
     }
 
-    public static filterToday(md: MenuDay[]): MenuDay[] {
+    public filterToday(md: MenuDay[]): MenuDay[] {
         return md.filter((md: MenuDay) => {
-            if (program.today) {
+            if (this.program.today) {
                 return md.day.isSame(moment(), 'day');
             }
 
@@ -36,7 +36,7 @@ class Foodfinder {
         });
     }
 
-    public static async loadPlace(place: Place): Promise<Place> {
+    public async loadPlace(place: Place): Promise<Place> {
         return axios.get(place.link).then((response: any) => {
             const dom = new JSDOM(response.data);
             const body = dom.window.document.body;
@@ -45,45 +45,24 @@ class Foodfinder {
         });
     }
 
-    public static renderTitle(place: Place) {
+    public renderTitle(place: Place) {
         console.log('------------------------');
         console.log(place.title);
         console.log('------------------------');
     }
 
-    public static renderDay(day: Moment) {
+    public renderDay(day: Moment) {
         const dayName = formatCalendar(day);
         const dayNum = day.format('DD.MM');
         console.log(`${dayName} ${dayNum}:`);
     }
 
-    public static renderItem(item: string) {
+    public renderItem(item: string) {
         console.log('- ' + item);
     }
 
-    public static processPlace(placeStr: string) {
-        const places = Foodfinder.places.filter(place => place.name.indexOf(placeStr) >= 0);
-        return places.length > 0 ? places : Foodfinder.places;
+    public processPlace(placeStr: string) {
+        const places = this.places.filter(place => place.name.indexOf(placeStr) >= 0);
+        return places.length > 0 ? places : this.places;
     }
 }
-
-// setup program
-program
-    .description(description)
-    .version(version, '-v, --version')
-    .option(
-        '-p, --place [place]',
-        'Ort von dem das Menü angezeigt werden soll',
-        (value: string) => Foodfinder.processPlace(value),
-        Foodfinder.places
-    )
-    .option(
-        '-t, --today',
-        'Zeigt nur das heutige Menü an',
-    );
-
-// run program
-program.parse(process.argv);
-
-// act upon input
-program.place.forEach((place: Place) => Foodfinder.render(place));
