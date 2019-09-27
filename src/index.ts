@@ -2,6 +2,7 @@
 
 import { Place } from './models';
 import { Foodfinder } from './foodfinder';
+import { Moment } from 'moment';
 const moment = require('moment');
 const program = require('commander');
 const { description, version } = require('../package.json')
@@ -22,10 +23,19 @@ program
     .option(
         '-t, --today',
         'Zeigt nur das heutige Menü an',
+    )
+    .option(
+        '-m, --tomorrow',
+        'Zeigt das Menü von morgen an',
+    )
+    .option(
+        '-d, --date <datum>',
+        'Zeigt Menü für bestimmtes Datum an',
+        (date: string): Moment => foodfinder.processDate(date),
     );
 
-// run program
+// parse arguments
 program.parse(process.argv);
 
-// act upon input
+// render menus upon program input
 program.place.forEach((place: Place) => foodfinder.render(place));

@@ -22,3 +22,12 @@ export class ElementNotFoundError extends Error {
         this.message = `Element "${elementName}" was not found in DOM`;
     }
 }
+
+export class DateNotValidError extends Error {
+    public message: string = 'Date is not valid!';
+
+    constructor(date: string) {
+        super();
+        this.message = `Date "${date}" is not valid!`;
+    }
+}

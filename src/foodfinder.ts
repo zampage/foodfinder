@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 import { JSDOM } from 'jsdom';
-import { Place, MenuDay } from './models';
+import { Place, MenuDay, DateNotValidError } from './models';
 import { formatCalendar } from './helper';
 import { Shopbar } from './places/shopbar';
 import { Coop } from './places/coop';
@@ -17,22 +17,43 @@ export class Foodfinder {
     ) {}
 
     public async render(place: Place) {
+        // setup
         place = await this.loadPlace(place);
+        let menus: MenuDay[] = place.menu;
+
+        // render title
         this.renderTitle(place);
-        this.filterToday(place.menu)
-            .forEach((md: MenuDay) => {
-                this.renderDay(md.day);
-                md.items.forEach(item => this.renderItem(item));
-            })
+
+        // filter dates
+        menus = this.filterToday(menus);
+        menus = this.filterTomorrow(menus);
+        menus = this.filterDate(menus);
+
+        // render days
+        menus.forEach((md: MenuDay) => {
+            this.renderDay(md.day);
+            md.items.forEach(item => this.renderItem(item));
+        })
     }
 
     public filterToday(md: MenuDay[]): MenuDay[] {
         return md.filter((md: MenuDay) => {
-            if (this.program.today) {
-                return md.day.isSame(moment(), 'day');
-            }
+            if (!this.program.today) return true;
+            return md.day.isSame(moment(), 'day');
+        });
+    }
 
-            return true;
+    public filterTomorrow(md: MenuDay[]): MenuDay[] {
+        return md.filter((md: MenuDay) => {
+            if (!this.program.tomorrow) return true;
+            return md.day.isSame(moment().add(1, 'day'), 'day');
+        });
+    }
+
+    public filterDate(md: MenuDay[]): MenuDay[] {
+        return md.filter((md: MenuDay) => {
+            if (this.program.date === undefined) return true;
+            return md.day.isSame(this.program.date, 'day');
         });
     }
 
@@ -64,5 +85,16 @@ export class Foodfinder {
     public processPlace(placeStr: string) {
         const places = this.places.filter(place => place.name.indexOf(placeStr) >= 0);
         return places.length > 0 ? places : this.places;
+    }
+
+    public processDate(date: string): Moment {
+        const allowedFormats: string[] = ['DD', 'DD.MM', 'DD.MM.YYYY', 'MM/DD', 'MM/DD/YYYY'];
+        const m = moment(date, allowedFormats, true);
+
+        if (!m.isValid()) {
+            throw new DateNotValidError(date);
+        }
+        
+        return m;
     }
 }
