@@ -1,4 +1,5 @@
 import { Moment, CalendarSpec } from "moment";
+const chalk = require('chalk');
 
 const calenderFormat_de: CalendarSpec = {
     lastDay : '[Gestern]',
@@ -17,3 +18,5 @@ export const preventBr = (element: Element) => {
 }
 
 export const formatCalendar = (day: Moment) => day.calendar(undefined, calenderFormat_de);
+
+export const HR = chalk.bold('-----------------------------');

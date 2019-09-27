@@ -2,13 +2,14 @@
 
 import { JSDOM } from 'jsdom';
 import { Place, MenuDay, DateNotValidError, PlaceNotAvailableError } from './models';
-import { formatCalendar } from './helper';
+import { formatCalendar, HR } from './helper';
 import { Shopbar } from './places/shopbar';
 import { Coop } from './places/coop';
 import { Moment } from 'moment';
 import { AxiosError } from 'axios';
 const axios = require('axios').default;
 const moment = require('moment');
+const chalk = require('chalk');
 
 export class Foodfinder {
     public places: Place[] = [new Shopbar(), new Coop()];
@@ -76,15 +77,17 @@ export class Foodfinder {
     }
 
     public renderTitle(place: Place) {
-        console.log('------------------------');
-        console.log(place.title);
-        console.log('------------------------');
+        console.log(HR);
+        console.log(chalk.bold(place.title));
+        console.log(HR);
     }
 
     public renderDay(day: Moment) {
         const dayName = formatCalendar(day);
         const dayNum = day.format('DD.MM');
-        console.log(`${dayName} ${dayNum}:`);
+        let output = chalk.bold(`${dayName} ${dayNum}:`);
+        if (day.isSame(moment(), 'day')) output = chalk.green(output);
+        console.log(output);
     }
 
     public renderItem(item: string) {
@@ -108,6 +111,9 @@ export class Foodfinder {
     }
 
     public renderError(error: Error) {
-        console.log(`${error.name}: ${error.message}`);
+        console.log(chalk.red(HR));
+        console.log(chalk.red.bold(error.name));
+        console.log(chalk.red(error.message));
+        console.log(chalk.red(HR));
     }
 }
