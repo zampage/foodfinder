@@ -1,11 +1,12 @@
 #!/usr/bin/env node
 
 import { JSDOM } from 'jsdom';
-import { Place, MenuDay, DateNotValidError } from './models';
+import { Place, MenuDay, DateNotValidError, PlaceNotAvailableError } from './models';
 import { formatCalendar } from './helper';
 import { Shopbar } from './places/shopbar';
 import { Coop } from './places/coop';
 import { Moment } from 'moment';
+import { AxiosError } from 'axios';
 const axios = require('axios').default;
 const moment = require('moment');
 
@@ -16,7 +17,7 @@ export class Foodfinder {
         public program: any
     ) {}
 
-    public async render(place: Place) {
+    public async render(place: Place): Promise<void> {
         // setup
         place = await this.loadPlace(place);
         let menus: MenuDay[] = place.menu;
@@ -33,7 +34,7 @@ export class Foodfinder {
         menus.forEach((md: MenuDay) => {
             this.renderDay(md.day);
             md.items.forEach(item => this.renderItem(item));
-        })
+        });
     }
 
     public filterToday(md: MenuDay[]): MenuDay[] {
@@ -58,12 +59,20 @@ export class Foodfinder {
     }
 
     public async loadPlace(place: Place): Promise<Place> {
-        return axios.get(place.link).then((response: any) => {
-            const dom = new JSDOM(response.data);
-            const body = dom.window.document.body;
-            place.menu = place.grep(body);
-            return place;
-        });
+        return axios.get(place.link)
+            .then((response: any) => {
+                const dom = new JSDOM(response.data);
+                const body = dom.window.document.body;
+                place.menu = place.grep(body);
+                return place;
+            })
+            .catch((error: AxiosError | Error) => {
+                if ((<AxiosError>error).isAxiosError) {
+                    throw new PlaceNotAvailableError(place.title);
+                } 
+                
+                throw error;                
+            });
     }
 
     public renderTitle(place: Place) {
@@ -96,5 +105,9 @@ export class Foodfinder {
         }
         
         return m;
+    }
+
+    public renderError(error: Error) {
+        console.log(`${error.name}: ${error.message}`);
     }
 }

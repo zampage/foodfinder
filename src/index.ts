@@ -17,7 +17,7 @@ program
     .option(
         '-p, --place [place]',
         'Ort von dem das Menü angezeigt werden soll',
-        (value: string) => foodfinder.processPlace(value),
+        (value: string): Place[] => foodfinder.processPlace(value),
         foodfinder.places
     )
     .option(
@@ -35,7 +35,15 @@ program
     );
 
 // parse arguments
-program.parse(process.argv);
+try {
+    program.parse(process.argv);
+} catch(error) {
+    foodfinder.renderError(error);
+}
 
 // render menus upon program input
-program.place.forEach((place: Place) => foodfinder.render(place));
+program.place.forEach((place: Place) => {
+    foodfinder
+        .render(place)
+        .catch(err => foodfinder.renderError(err));
+});

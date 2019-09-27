@@ -15,19 +15,25 @@ export class MenuDay {
 }
 
 export class ElementNotFoundError extends Error {
-    public message: string = 'Element was not found!';
+    public name: string = 'ElementNotFoundError';
 
     constructor(elementName: string) {
-        super();
-        this.message = `Element "${elementName}" was not found in DOM`;
+        super(`Element "${elementName}" was not found in DOM`);
     }
 }
 
 export class DateNotValidError extends Error {
-    public message: string = 'Date is not valid!';
+    public name: string = 'DateNotValidError';
 
     constructor(date: string) {
-        super();
-        this.message = `Date "${date}" is not valid!`;
+        super(`Date "${date}" is not valid!`);
+    }
+}
+
+export class PlaceNotAvailableError extends Error {
+    public name: string = 'PlaceNotAvailableError';
+
+    constructor(place:string) {
+        super(`Place "${place}" is not available!`)
     }
 }
